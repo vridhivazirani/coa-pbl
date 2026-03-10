@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Results — I/O Transfer Techniques</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style>
+  body { overflow-y: auto; height: auto; }
+  .sim-topnav { display: flex; align-items: center; gap: 16px; padding: 18px 80px; background: rgba(45,32,64,0.95); backdrop-filter: blur(12px); position: sticky; top: 0; z-index: 100; border-bottom: 1px solid rgba(255,255,255,.08); }
+  .sim-topnav a { font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,.5); text-decoration: none; padding: 6px 14px; border-radius: 100px; transition: all .2s; }
+  .sim-topnav a:hover { color: white; background: rgba(255,255,255,.1); }
+  .sim-topnav a.active { color: #5ECFB4; border: 1px solid #5ECFB4; }
+  .sim-topnav .logo { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 800; color: white; margin-right: auto; }
+  .page-wrap { padding: 60px 80px; max-width: 1100px; margin: 0 auto; }
+  .s-tag { font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 4px; text-transform: uppercase; color: #7B6EA8; margin-bottom: 14px; display: flex; align-items: center; gap: 10px; }
+  .s-tag::before { content: ''; display: block; width: 24px; height: 2px; background: #D4615A; }
+  .s-title { font-size: clamp(24px, 3vw, 40px); font-weight: 800; line-height: 1.1; color: var(--text); margin-bottom: 20px; }
+  .s-title em { color: #D4615A; font-style: normal; }
+  .s-body { font-size: 15px; line-height: 1.85; color: var(--sub); max-width: 720px; margin-bottom: 36px; }
+  .r-section { margin-bottom: 72px; }
+  .back-link { display: inline-flex; align-items: center; gap: 8px; font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 700; color: var(--sub); text-decoration: none; padding: 8px 0; transition: color .2s; margin-bottom: 36px; }
+  .back-link:hover { color: #D4615A; }
+
+  /* Chart card */
+  .chart-card { background: var(--white); border-radius: 18px; padding: 32px; box-shadow: 0 4px 24px var(--shadow); border: 1px solid var(--border); margin-bottom: 28px; transition: background .4s; }
+  .chart-card-hd { font-size: 16px; font-weight: 800; margin-bottom: 4px; }
+  .chart-card-sub { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--sub); margin-bottom: 20px; }
+  .chart-tabs { display: flex; gap: 6px; margin-bottom: 20px; flex-wrap: wrap; }
+  .ctab { padding: 7px 16px; border-radius: 100px; font-family: 'Space Mono', monospace; font-size: 10px; font-weight: 700; cursor: pointer; border: 1.5px solid var(--border); background: var(--white); color: var(--sub); transition: all .2s; }
+  .ctab.active { background: #D4615A; border-color: #D4615A; color: white; }
+  canvas { width: 100%; display: block; }
+
+  /* Results table */
+  .res-table { width: 100%; border-collapse: collapse; border-radius: 14px; overflow: hidden; margin-bottom: 28px; font-size: 13px; }
+  .res-table th { background: var(--dark); color: white; padding: 13px 18px; font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; text-align: right; }
+  .res-table th:first-child { text-align: left; }
+  .res-table td { padding: 12px 18px; text-align: right; border-bottom: 1px solid var(--border); font-family: 'Space Mono', monospace; font-size: 12px; }
+  .res-table td:first-child { text-align: left; font-weight: 700; color: var(--text); }
+  .res-table tr:last-child td { border-bottom: none; }
+  .res-table .best { color: #5ECFB4; font-weight: 700; }
+  .res-table .worst { color: #D4615A; }
+
+  /* Summary cards */
+  .summary-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 18px; margin-bottom: 40px; }
+  .sum-card { border-radius: 16px; padding: 28px; color: white; position: relative; overflow: hidden; }
+  .sum-card::after { content: ''; position: absolute; top: -30px; right: -30px; width: 120px; height: 120px; border-radius: 50%; background: rgba(255,255,255,.07); }
+  .sum-card-label { font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 3px; text-transform: uppercase; opacity: .6; margin-bottom: 12px; }
+  .sum-card-val { font-size: 36px; font-weight: 800; line-height: 1; margin-bottom: 8px; }
+  .sum-card-desc { font-size: 12px; opacity: .7; line-height: 1.5; }
+  .sc-pio { background: linear-gradient(135deg, #D4615A, #B84A44); }
+  .sc-int { background: linear-gradient(135deg, #7B6EA8, #5A4E88); }
+  .sc-dma { background: linear-gradient(135deg, #2A8A72, #1A6A55); }
+</style>
+</head>
+<body>
+
+<nav class="sim-topnav">
+  <div class="logo">Studio Shodwe</div>
+  <a href="index.html">Home</a>
+  <a href="simulation.html">Simulation</a>
+  <a href="results.html" class="active">Results</a>
+</nav>
+
+<div class="page-wrap">
+  <a href="index.html" class="back-link">← Back to Main Project</a>
+
+  <!-- INTRO -->
+  <div class="r-section">
+    <div class="s-tag">Performance Analysis</div>
+    <div class="s-title">Simulation <em>Results</em></div>
+    <p class="s-body">Results from running the simulation across 7 data sizes (1MB to 1GB). Charts show how each technique scales with increasing data size across total time, CPU busy time, throughput, and CPU utilization.</p>
+
+    <div class="summary-grid">
+      <div class="sum-card sc-pio">
+        <div class="sum-card-label">Programmed I/O</div>
+        <div class="sum-card-val">68%</div>
+        <div class="sum-card-desc">Average CPU utilization. Best for small transfers under 5MB where setup overhead matters.</div>
+      </div>
+      <div class="sum-card sc-int">
+        <div class="sum-card-label">Interrupt-Driven</div>
+        <div class="sum-card-val">~3%</div>
+        <div class="sum-card-desc">CPU utilization at 50MB. Ideal for medium workloads — CPU is mostly free between interrupts.</div>
+      </div>
+      <div class="sum-card sc-dma">
+        <div class="sum-card-label">DMA</div>
+        <div class="sum-card-val">~0%</div>
+        <div class="sum-card-desc">CPU utilization during transfer. Best total time for large data — CPU only used at init.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHART -->
+  <div class="r-section">
+    <div class="s-tag">Visualization</div>
+    <div class="s-title">Performance <em>Charts</em></div>
+    <div class="chart-card">
+      <div class="chart-tabs">
+        <button class="ctab active" onclick="setChart('cpu',this)">CPU Busy Time</button>
+        <button class="ctab" onclick="setChart('total',this)">Total Time</button>
+        <button class="ctab" onclick="setChart('throughput',this)">Throughput</button>
+        <button class="ctab" onclick="setChart('util',this)">CPU Util %</button>
+      </div>
+      <div class="chart-card-hd" id="chartTitle">CPU Busy Time vs. Data Size</div>
+      <div class="chart-card-sub" id="chartSub">Lower is better — time the CPU is blocked handling I/O.</div>
+      <canvas id="resultsChart" height="260"></canvas>
+    </div>
+  </div>
+
+  <!-- DATA TABLE -->
+  <div class="r-section">
+    <div class="s-tag">Raw Data</div>
+    <div class="s-title">Simulation <em>Data Table</em></div>
+    <table class="res-table" id="dataTable">
+      <thead>
+        <tr>
+          <th>Data Size</th>
+          <th>PIO Time (s)</th>
+          <th>PIO CPU (s)</th>
+          <th>INT Time (s)</th>
+          <th>INT CPU (s)</th>
+          <th>DMA Time (s)</th>
+          <th>DMA CPU (s)</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+  </div>
+
+  <!-- FINDINGS -->
+  <div class="r-section">
+    <div class="s-tag">Findings</div>
+    <div class="s-title">Key <em>Observations</em></div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;">
+      <div style="background:var(--white);border-radius:14px;padding:24px;border:1px solid var(--border);box-shadow:0 2px 12px var(--shadow);">
+        <div style="font-family:'Space Mono',monospace;font-size:11px;color:#D4615A;font-weight:700;margin-bottom:10px;">PROGRAMMED I/O</div>
+        <p style="font-size:13px;line-height:1.7;color:var(--sub);">Fastest for tiny data (&lt;5MB) due to zero setup overhead. CPU utilization stays at ~68% regardless of data size — it never improves, making it unsuitable for large transfers.</p>
+      </div>
+      <div style="background:var(--white);border-radius:14px;padding:24px;border:1px solid var(--border);box-shadow:0 2px 12px var(--shadow);">
+        <div style="font-family:'Space Mono',monospace;font-size:11px;color:#7B6EA8;font-weight:700;margin-bottom:10px;">INTERRUPT-DRIVEN I/O</div>
+        <p style="font-size:13px;line-height:1.7;color:var(--sub);">CPU utilization grows with data size due to more interrupts and context switches. Optimal range is 10–80MB — frees CPU between transfers while keeping hardware cost reasonable.</p>
+      </div>
+      <div style="background:var(--white);border-radius:14px;padding:24px;border:1px solid var(--border);box-shadow:0 2px 12px var(--shadow);">
+        <div style="font-family:'Space Mono',monospace;font-size:11px;color:#2A8A72;font-weight:700;margin-bottom:10px;">DMA</div>
+        <p style="font-size:13px;line-height:1.7;color:var(--sub);">CPU overhead stays near 0% regardless of data size. Total time is lowest for large transfers. Bus arbitration slightly reduces effective rate to ~97 MB/s, but still outperforms others at scale.</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// Simulation model (mirrored from script.js)
+const TR=100, IO=0.002, CS=0.001, DI=0.0005, IB=10;
+const PIO_POLL=0.15, PIO_CPU=0.68, DMA_EFF=97;
+function pio(s){ const t=s/TR; const p=t*PIO_POLL; const tot=t+p; return {total:tot, cpu:tot*PIO_CPU}; }
+function iio(s){ const t=s/TR, n=Math.max(1,Math.floor(s/IB)), ov=n*(IO+CS); return {total:t+ov, cpu:ov}; }
+function dma(s){ return {total:s/DMA_EFF, cpu:DI}; }
+
+const SIZES = [1,10,50,100,250,500,1000];
+let curChart = 'cpu';
+
+// Build table
+const tbody = document.getElementById('tableBody');
+SIZES.forEach(s => {
+  const p=pio(s), n=iio(s), d=dma(s);
+  const minTime = Math.min(p.total, n.total, d.total);
+  const minCPU  = Math.min(p.cpu, n.cpu, d.cpu);
+  function cls(v, best){ return v===best ? 'best' : v===Math.max(p.total,n.total,d.total)||v===Math.max(p.cpu,n.cpu,d.cpu) ? 'worst' : ''; }
+  tbody.innerHTML += `<tr>
+    <td>${s >= 1000 ? '1 GB' : s + ' MB'}</td>
+    <td class="${cls(p.total,minTime)}">${p.total.toFixed(4)}</td>
+    <td class="${cls(p.cpu,minCPU)}">${p.cpu.toFixed(4)}</td>
+    <td class="${cls(n.total,minTime)}">${n.total.toFixed(4)}</td>
+    <td class="${cls(n.cpu,minCPU)}">${n.cpu.toFixed(4)}</td>
+    <td class="${cls(d.total,minTime)}">${d.total.toFixed(4)}</td>
+    <td class="${cls(d.cpu,minCPU)}">${d.cpu.toFixed(5)}</td>
+  </tr>`;
+});
+
+function setChart(type, btn) {
+  curChart = type;
+  document.querySelectorAll('.ctab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const cfg = {
+    cpu:        ['CPU Busy Time vs. Data Size',        'Lower is better — time the CPU is blocked handling I/O.'],
+    total:      ['Total Transfer Time vs. Data Size',  'Overall wall-clock time including all overhead.'],
+    throughput: ['Throughput vs. Data Size (MB/s)',    'Higher is better — effective data transfer rate.'],
+    util:       ['CPU Utilization % vs. Data Size',    'Lower means the CPU is more free for other work.']
+  };
+  document.getElementById('chartTitle').textContent = cfg[type][0];
+  document.getElementById('chartSub').textContent   = cfg[type][1];
+  drawChart();
+}
+
+function drawChart() {
+  const canvas = document.getElementById('resultsChart');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const dpr = window.devicePixelRatio || 1;
+  const rawW = canvas.parentElement.clientWidth - 64;
+  const W = rawW > 10 ? rawW : 700, H = 260;
+  canvas.width = W*dpr; canvas.height = H*dpr;
+  canvas.style.width = W+'px'; canvas.style.height = H+'px';
+  ctx.scale(dpr, dpr);
+  const dark = document.documentElement.getAttribute('data-theme') === 'dark';
+  ctx.fillStyle = dark ? '#241A36' : '#fff';
+  ctx.fillRect(0,0,W,H);
+
+  let pd, nd, dd, yl;
+  if (curChart==='cpu')        { pd=SIZES.map(s=>pio(s).cpu);          nd=SIZES.map(s=>iio(s).cpu);          dd=SIZES.map(s=>dma(s).cpu);          yl='s'; }
+  else if (curChart==='total') { pd=SIZES.map(s=>pio(s).total);        nd=SIZES.map(s=>iio(s).total);        dd=SIZES.map(s=>dma(s).total);        yl='s'; }
+  else if (curChart==='throughput') { pd=SIZES.map(s=>s/pio(s).total); nd=SIZES.map(s=>s/iio(s).total);     dd=SIZES.map(s=>s/dma(s).total);      yl='MB/s'; }
+  else { pd=SIZES.map(s=>{const r=pio(s);return r.cpu/r.total*100;}); nd=SIZES.map(s=>{const r=iio(s);return r.cpu/r.total*100;}); dd=SIZES.map(s=>{const r=dma(s);return r.cpu/r.total*100;}); yl='%'; }
+
+  const gc = dark ? 'rgba(255,255,255,.06)' : '#eee';
+  const lc = dark ? '#888' : '#999';
+  const PAD = {l:62,r:24,t:28,b:40};
+  const pw = W-PAD.l-PAD.r, ph = H-PAD.t-PAD.b;
+  const maxY = Math.max(...pd,...nd,...dd)*1.12 || 1;
+
+  ctx.strokeStyle=gc; ctx.lineWidth=1;
+  for(let i=0;i<=4;i++){
+    const y=PAD.t+ph-(i/4)*ph;
+    ctx.beginPath(); ctx.moveTo(PAD.l,y); ctx.lineTo(W-PAD.r,y); ctx.stroke();
+    ctx.fillStyle=lc; ctx.font='9px Space Mono,monospace'; ctx.textAlign='right';
+    const v=maxY*i/4;
+    ctx.fillText((v>=10?v.toFixed(1):v>=1?v.toFixed(2):v.toFixed(3))+yl,PAD.l-6,y+3);
+  }
+  ctx.fillStyle=lc; ctx.textAlign='center'; ctx.font='9px Space Mono,monospace';
+  SIZES.forEach((s,i)=>ctx.fillText(s>=1000?'1GB':s+'MB', PAD.l+(i/(SIZES.length-1))*pw, H-10));
+
+  function line(data, color, dashed){
+    ctx.setLineDash(dashed?[5,4]:[]);
+    ctx.beginPath(); ctx.strokeStyle=color; ctx.lineWidth=2.5; ctx.lineJoin='round';
+    data.forEach((v,i)=>{const x=PAD.l+(i/(SIZES.length-1))*pw, y=PAD.t+ph-(v/maxY)*ph; i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);});
+    ctx.stroke(); ctx.setLineDash([]);
+    data.forEach((v,i)=>{const x=PAD.l+(i/(SIZES.length-1))*pw, y=PAD.t+ph-(v/maxY)*ph; ctx.beginPath(); ctx.fillStyle=color; ctx.arc(x,y,4,0,Math.PI*2); ctx.fill();});
+  }
+  line(pd,'#D4615A'); line(nd,'#7B6EA8',true); line(dd,'#5ECFB4');
+
+  [['PIO','#D4615A'],['Interrupt','#7B6EA8'],['DMA','#5ECFB4']].forEach(([l,c],i)=>{
+    const lx=PAD.l+i*110, ly=PAD.t+12;
+    ctx.fillStyle=c; ctx.fillRect(lx,ly,18,2.5);
+    ctx.fillStyle=dark?'#ccc':'#555'; ctx.font='10px Space Mono,monospace'; ctx.textAlign='left';
+    ctx.fillText(l,lx+24,ly+4);
+  });
+}
+
+window.addEventListener('load', () => requestAnimationFrame(drawChart));
+window.addEventListener('resize', drawChart);
+
+// Theme
+const saved = localStorage.getItem('theme') || 'light';
+document.documentElement.setAttribute('data-theme', saved);
+</script>
+</body>
+</html>

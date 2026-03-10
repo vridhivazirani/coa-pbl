@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulation — I/O Transfer Techniques</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style>
+  body { overflow-y: auto; height: auto; }
+  .sim-page { margin-left: 0; padding: 48px 80px; max-width: 960px; margin: 0 auto; }
+  .sim-topnav { display: flex; align-items: center; gap: 16px; padding: 18px 80px; background: rgba(45,32,64,0.95); backdrop-filter: blur(12px); position: sticky; top: 0; z-index: 100; border-bottom: 1px solid rgba(255,255,255,.08); }
+  .sim-topnav a { font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,.5); text-decoration: none; padding: 6px 14px; border-radius: 100px; transition: all .2s; }
+  .sim-topnav a:hover { color: white; background: rgba(255,255,255,.1); }
+  .sim-topnav a.active { color: #5ECFB4; border: 1px solid #5ECFB4; }
+  .sim-topnav .logo { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 800; color: white; margin-right: auto; }
+  .page-wrap { padding: 60px 80px; max-width: 960px; margin: 0 auto; }
+  .s-section { margin-bottom: 60px; }
+  .s-tag { font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 4px; text-transform: uppercase; color: #7B6EA8; margin-bottom: 14px; display: flex; align-items: center; gap: 10px; }
+  .s-tag::before { content: ''; display: block; width: 24px; height: 2px; background: #D4615A; }
+  .s-title { font-size: clamp(24px, 3vw, 40px); font-weight: 800; line-height: 1.1; color: var(--text); margin-bottom: 20px; }
+  .s-title em { color: #D4615A; font-style: normal; }
+  .s-body { font-size: 15px; line-height: 1.85; color: var(--sub); max-width: 720px; }
+  .code-block { background: #1A1228; border-radius: 14px; overflow: hidden; margin: 24px 0; border: 1px solid rgba(255,255,255,.08); }
+  .code-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; background: rgba(255,255,255,.04); border-bottom: 1px solid rgba(255,255,255,.07); }
+  .code-lang { font-family: 'Space Mono', monospace; font-size: 11px; color: #5ECFB4; font-weight: 700; letter-spacing: 2px; }
+  .code-dots { display: flex; gap: 6px; }
+  .code-dots span { width: 10px; height: 10px; border-radius: 50%; }
+  .code-dots span:nth-child(1) { background: #FF5F57; }
+  .code-dots span:nth-child(2) { background: #FFBD2E; }
+  .code-dots span:nth-child(3) { background: #28C840; }
+  pre { padding: 24px; margin: 0; overflow-x: auto; }
+  pre code { font-family: 'Space Mono', monospace; font-size: 12.5px; line-height: 1.8; color: #EDE8F5; }
+  .kw { color: #C4B8E8; } .fn { color: #5ECFB4; } .cm { color: #5A4E7A; font-style: italic; }
+  .str { color: #E8A09A; } .num { color: #FFD4A0; }
+  .algo-steps { list-style: none; display: flex; flex-direction: column; gap: 14px; margin: 24px 0; }
+  .algo-step { display: flex; gap: 16px; align-items: flex-start; padding: 18px 20px; background: var(--white); border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 2px 10px var(--shadow); transition: background .4s; }
+  .algo-n { flex-shrink: 0; width: 32px; height: 32px; border-radius: 8px; background: var(--coral,#D4615A); color: white; display: flex; align-items: center; justify-content: center; font-family: 'Space Mono', monospace; font-size: 12px; font-weight: 700; }
+  .algo-text { font-size: 14px; line-height: 1.6; color: var(--text); }
+  .algo-text strong { color: #D4615A; }
+  .const-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; margin: 20px 0; }
+  .const-card { background: var(--white); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; transition: background .4s; }
+  .const-name { font-family: 'Space Mono', monospace; font-size: 11px; color: #5ECFB4; font-weight: 700; margin-bottom: 4px; }
+  .const-val { font-size: 20px; font-weight: 800; color: #D4615A; }
+  .const-desc { font-size: 11px; color: var(--sub); margin-top: 4px; }
+  .back-link { display: inline-flex; align-items: center; gap: 8px; font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 700; color: var(--sub); text-decoration: none; padding: 8px 0; transition: color .2s; margin-bottom: 36px; }
+  .back-link:hover { color: #D4615A; }
+</style>
+</head>
+<body>
+
+<nav class="sim-topnav">
+  <div class="logo">Studio Shodwe</div>
+  <a href="index.html">Home</a>
+  <a href="simulation.html" class="active">Simulation</a>
+  <a href="results.html">Results</a>
+</nav>
+
+<div class="page-wrap">
+  <a href="index.html" class="back-link">← Back to Main Project</a>
+
+  <!-- INTRO -->
+  <div class="s-section">
+    <div class="s-tag">Overview</div>
+    <div class="s-title">How the <em>Simulation</em> Works</div>
+    <p class="s-body">
+      Our simulation models the performance of three I/O data transfer techniques — <strong>Programmed I/O</strong>, <strong>Interrupt-Driven I/O</strong>, and <strong>DMA</strong> — by calculating total transfer time, CPU busy time, and throughput for varying data sizes. The model is based on defined hardware constants derived from typical embedded system benchmarks.
+    </p>
+  </div>
+
+  <!-- CONSTANTS -->
+  <div class="s-section">
+    <div class="s-tag">Model Parameters</div>
+    <div class="s-title">Simulation <em>Constants</em></div>
+    <div class="const-grid">
+      <div class="const-card"><div class="const-name">TRANSFER_RATE</div><div class="const-val">100 MB/s</div><div class="const-desc">Base data transfer speed over the system bus</div></div>
+      <div class="const-card"><div class="const-name">INTERRUPT_OVERHEAD</div><div class="const-val">0.002s</div><div class="const-desc">Time cost per interrupt signal received</div></div>
+      <div class="const-card"><div class="const-name">CONTEXT_SWITCH</div><div class="const-val">0.001s</div><div class="const-desc">CPU state save/restore time per interrupt</div></div>
+      <div class="const-card"><div class="const-name">DMA_INIT_TIME</div><div class="const-val">0.0005s</div><div class="const-desc">One-time DMA controller setup cost</div></div>
+      <div class="const-card"><div class="const-name">INTERRUPT_BLOCK</div><div class="const-val">10 MB</div><div class="const-desc">Data chunk size per interrupt cycle</div></div>
+      <div class="const-card"><div class="const-name">PIO_CPU_FACTOR</div><div class="const-val">0.68</div><div class="const-desc">CPU active fraction during polling</div></div>
+    </div>
+  </div>
+
+  <!-- ALGORITHM -->
+  <div class="s-section">
+    <div class="s-tag">Logic</div>
+    <div class="s-title">Simulation <em>Algorithm</em></div>
+    <ul class="algo-steps">
+      <li class="algo-step"><div class="algo-n">1</div><div class="algo-text"><strong>Input:</strong> data size in MB (tested at 1, 10, 50, 100, 250, 500, 1000 MB)</div></li>
+      <li class="algo-step"><div class="algo-n">2</div><div class="algo-text"><strong>PIO:</strong> total_time = size / rate × 1.15 (polling overhead). cpu_time = total_time × 0.68</div></li>
+      <li class="algo-step"><div class="algo-n">3</div><div class="algo-text"><strong>Interrupt I/O:</strong> n_interrupts = size / 10. overhead = n × (0.002 + 0.001). cpu_time = overhead only</div></li>
+      <li class="algo-step"><div class="algo-n">4</div><div class="algo-text"><strong>DMA:</strong> total_time = size / 97 (reduced effective rate). cpu_time = 0.0005s (init only)</div></li>
+      <li class="algo-step"><div class="algo-n">5</div><div class="algo-text"><strong>Output:</strong> total time (s), CPU busy time (s), throughput (MB/s), CPU utilization (%)</div></li>
+    </ul>
+  </div>
+
+  <!-- PSEUDOCODE -->
+  <div class="s-section">
+    <div class="s-tag">Pseudocode</div>
+    <div class="s-title">Step-by-Step <em>Pseudocode</em></div>
+    <div class="code-block">
+      <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><div class="code-lang">PSEUDOCODE</div></div>
+      <pre><code>CONSTANTS:
+  RATE = 100, IO_OVERHEAD = 0.002, CTX = 0.001
+  DMA_INIT = 0.0005, BLOCK = 10
+
+FUNCTION simulate_pio(size):
+  base_time = size / RATE
+  poll_time = base_time * 0.15        <span class="cm">// polling overhead</span>
+  total     = base_time + poll_time
+  cpu       = total * 0.68            <span class="cm">// partial CPU usage</span>
+  RETURN total, cpu
+
+FUNCTION simulate_interrupt(size):
+  transfer = size / RATE
+  n_irq    = MAX(1, FLOOR(size / BLOCK))
+  overhead = n_irq * (IO_OVERHEAD + CTX)
+  total    = transfer + overhead
+  cpu      = overhead                 <span class="cm">// CPU only during ISR</span>
+  RETURN total, cpu
+
+FUNCTION simulate_dma(size):
+  total = size / 97                   <span class="cm">// bus arbitration reduces rate</span>
+  cpu   = DMA_INIT                    <span class="cm">// only setup time</span>
+  RETURN total, cpu
+
+FOR each size IN [1, 10, 50, 100, 250, 500, 1000]:
+  PRINT simulate_pio(size)
+  PRINT simulate_interrupt(size)
+  PRINT simulate_dma(size)</code></pre>
+    </div>
+  </div>
+
+  <!-- PYTHON CODE -->
+  <div class="s-section">
+    <div class="s-tag">Source Code</div>
+    <div class="s-title">Python <em>Implementation</em></div>
+    <div class="code-block">
+      <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><div class="code-lang">PYTHON</div></div>
+      <pre><code><span class="cm"># io_simulation.py — Studio Shodwe · COA Project</span>
+<span class="cm"># Simulates Programmed I/O, Interrupt-Driven I/O, and DMA performance</span>
+
+<span class="kw">import</span> math
+
+<span class="cm"># ── Constants ──────────────────────────────────────────</span>
+TRANSFER_RATE       = <span class="num">100</span>     <span class="cm"># MB/s</span>
+INTERRUPT_OVERHEAD  = <span class="num">0.002</span>   <span class="cm"># seconds per interrupt</span>
+CONTEXT_SWITCH      = <span class="num">0.001</span>   <span class="cm"># seconds per context switch</span>
+DMA_INIT_TIME       = <span class="num">0.0005</span>  <span class="cm"># seconds (one-time setup)</span>
+INTERRUPT_BLOCK_SIZE = <span class="num">10</span>     <span class="cm"># MB per interrupt block</span>
+PIO_POLL_OVERHEAD   = <span class="num">0.15</span>    <span class="cm"># 15% extra time for polling</span>
+PIO_CPU_FACTOR      = <span class="num">0.68</span>    <span class="cm"># fraction of time CPU is active</span>
+DMA_EFF_RATE        = <span class="num">97</span>      <span class="cm"># effective MB/s (bus contention)</span>
+
+DATA_SIZES = [<span class="num">1</span>, <span class="num">10</span>, <span class="num">50</span>, <span class="num">100</span>, <span class="num">250</span>, <span class="num">500</span>, <span class="num">1000</span>]  <span class="cm"># MB</span>
+
+<span class="cm"># ── Programmed I/O ─────────────────────────────────────</span>
+<span class="kw">def</span> <span class="fn">simulate_programmed_io</span>(size_mb):
+    base_time   = size_mb / TRANSFER_RATE
+    poll_time   = base_time * PIO_POLL_OVERHEAD
+    total_time  = base_time + poll_time
+    cpu_time    = total_time * PIO_CPU_FACTOR
+    throughput  = size_mb / total_time
+    cpu_util    = (cpu_time / total_time) * <span class="num">100</span>
+    <span class="kw">return</span> {
+        <span class="str">"total_time"</span>: total_time,
+        <span class="str">"cpu_time"</span>:   cpu_time,
+        <span class="str">"throughput"</span>: throughput,
+        <span class="str">"cpu_util"</span>:   cpu_util
+    }
+
+<span class="cm"># ── Interrupt-Driven I/O ───────────────────────────────</span>
+<span class="kw">def</span> <span class="fn">simulate_interrupt_io</span>(size_mb):
+    transfer_time = size_mb / TRANSFER_RATE
+    n_interrupts  = max(<span class="num">1</span>, math.floor(size_mb / INTERRUPT_BLOCK_SIZE))
+    overhead      = n_interrupts * (INTERRUPT_OVERHEAD + CONTEXT_SWITCH)
+    total_time    = transfer_time + overhead
+    cpu_time      = overhead
+    throughput    = size_mb / total_time
+    cpu_util      = (cpu_time / total_time) * <span class="num">100</span>
+    <span class="kw">return</span> {
+        <span class="str">"total_time"</span>:   total_time,
+        <span class="str">"cpu_time"</span>:     cpu_time,
+        <span class="str">"throughput"</span>:   throughput,
+        <span class="str">"cpu_util"</span>:     cpu_util,
+        <span class="str">"n_interrupts"</span>: n_interrupts
+    }
+
+<span class="cm"># ── DMA ────────────────────────────────────────────────</span>
+<span class="kw">def</span> <span class="fn">simulate_dma</span>(size_mb):
+    total_time = size_mb / DMA_EFF_RATE
+    cpu_time   = DMA_INIT_TIME
+    throughput = size_mb / total_time
+    cpu_util   = (cpu_time / total_time) * <span class="num">100</span>
+    <span class="kw">return</span> {
+        <span class="str">"total_time"</span>: total_time,
+        <span class="str">"cpu_time"</span>:   cpu_time,
+        <span class="str">"throughput"</span>: throughput,
+        <span class="str">"cpu_util"</span>:   cpu_util
+    }
+
+<span class="cm"># ── Run & Print Results ────────────────────────────────</span>
+<span class="kw">def</span> <span class="fn">run_simulation</span>():
+    header = <span class="str">f"{'Size':>6} | {'PIO Time':>10} | {'PIO CPU':>10} | {'INT Time':>10} | {'INT CPU':>10} | {'DMA Time':>10} | {'DMA CPU':>10}"</span>
+    <span class="fn">print</span>(header)
+    <span class="fn">print</span>(<span class="str">"-"</span> * <span class="fn">len</span>(header))
+
+    <span class="kw">for</span> size <span class="kw">in</span> DATA_SIZES:
+        p = <span class="fn">simulate_programmed_io</span>(size)
+        n = <span class="fn">simulate_interrupt_io</span>(size)
+        d = <span class="fn">simulate_dma</span>(size)
+        <span class="fn">print</span>(<span class="str">f"{size:>5}MB | {p['total_time']:>9.4f}s | {p['cpu_time']:>9.4f}s | {n['total_time']:>9.4f}s | {n['cpu_time']:>9.4f}s | {d['total_time']:>9.4f}s | {d['cpu_time']:>9.5f}s"</span>)
+
+<span class="kw">if</span> __name__ == <span class="str">"__main__"</span>:
+    <span class="fn">run_simulation</span>()</code></pre>
+    </div>
+  </div>
+
+  <!-- LIVE SIMULATOR -->
+  <div class="s-section">
+    <div class="s-tag">Try It Live</div>
+    <div class="s-title">Interactive <em>Simulator</em></div>
+    <p class="s-body" style="margin-bottom:28px;">Drag the slider to set a data size and instantly see how all three techniques compare in real time.</p>
+
+    <!-- Slider + Presets -->
+    <div class="live-ctrl">
+      <div class="live-row">
+        <span class="live-label">Data Size</span>
+        <input type="range" id="liveSlider" min="1" max="1000" value="50" oninput="liveUpdate(this.value)">
+        <span class="live-val" id="liveVal">50 MB</span>
+      </div>
+      <div class="live-presets">
+        <span class="live-preset-lbl">Presets:</span>
+        <button class="lp-btn" onclick="livePreset(1,this)">1 MB</button>
+        <button class="lp-btn active" onclick="livePreset(50,this)">50 MB</button>
+        <button class="lp-btn" onclick="livePreset(250,this)">250 MB</button>
+        <button class="lp-btn" onclick="livePreset(1000,this)">1 GB</button>
+      </div>
+    </div>
+
+    <!-- Metric cards -->
+    <div class="live-cards">
+      <div class="live-card" style="--ac:#D4615A">
+        <div class="lc-title">Programmed I/O</div>
+        <div class="lc-row"><span class="lc-lbl">Total Time</span><span class="lc-val"><span id="l-pio-time">—</span> s</span></div>
+        <div class="lc-row"><span class="lc-lbl">CPU Busy</span><span class="lc-val"><span id="l-pio-cpu">—</span> s</span></div>
+        <div class="lc-row"><span class="lc-lbl">Throughput</span><span class="lc-val"><span id="l-pio-tp">—</span> MB/s</span></div>
+        <div class="lc-bar-wrap">
+          <div class="lc-bar-top"><span>CPU Utilization</span><span id="l-pio-util">—</span></div>
+          <div class="lc-bar-bg"><div class="lc-bar-fill" id="l-pio-bar" style="width:0%"></div></div>
+        </div>
+      </div>
+      <div class="live-card" style="--ac:#7B6EA8">
+        <div class="lc-title">Interrupt-Driven</div>
+        <div class="lc-row"><span class="lc-lbl">Total Time</span><span class="lc-val"><span id="l-int-time">—</span> s</span></div>
+        <div class="lc-row"><span class="lc-lbl">CPU Busy</span><span class="lc-val"><span id="l-int-cpu">—</span> s</span></div>
+        <div class="lc-row"><span class="lc-lbl">Throughput</span><span class="lc-val"><span id="l-int-tp">—</span> MB/s</span></div>
+        <div class="lc-bar-wrap">
+          <div class="lc-bar-top"><span>CPU Utilization</span><span id="l-int-util">—</span></div>
+          <div class="lc-bar-bg"><div class="lc-bar-fill" id="l-int-bar" style="width:0%"></div></div>
+        </div>
+      </div>
+      <div class="live-card" style="--ac:#5ECFB4">
+        <div class="lc-title">DMA</div>
+        <div class="lc-row"><span class="lc-lbl">Total Time</span><span class="lc-val"><span id="l-dma-time">—</span> s</span></div>
+        <div class="lc-row"><span class="lc-lbl">CPU Busy</span><span class="lc-val"><span id="l-dma-cpu">—</span> s</span></div>
+        <div class="lc-row"><span class="lc-lbl">Throughput</span><span class="lc-val"><span id="l-dma-tp">—</span> MB/s</span></div>
+        <div class="lc-bar-wrap">
+          <div class="lc-bar-top"><span>CPU Utilization</span><span id="l-dma-util">—</span></div>
+          <div class="lc-bar-bg"><div class="lc-bar-fill" id="l-dma-bar" style="width:0%"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Best method banner -->
+    <div class="live-best" id="liveBest">
+      <span class="lb-label">Best Method for this size:</span>
+      <span class="lb-winner" id="lbWinner">DMA</span>
+      <span class="lb-reason" id="lbReason">DMA frees the CPU entirely for large transfers.</span>
+    </div>
+  </div>
+
+</div><!-- end page-wrap -->
+
+<style>
+/* ── Live Simulator Styles ── */
+.live-ctrl { background: var(--white); border: 1px solid var(--border); border-radius: 16px; padding: 28px 32px; margin-bottom: 24px; box-shadow: 0 2px 12px var(--shadow); transition: background .4s; }
+.live-row { display: flex; align-items: center; gap: 16px; margin-bottom: 16px; flex-wrap: wrap; }
+.live-label { font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--sub); min-width: 80px; }
+#liveSlider { flex: 1; min-width: 200px; max-width: 480px; -webkit-appearance: none; appearance: none; height: 5px; border-radius: 3px; background: #ddd; outline: none; cursor: pointer; }
+#liveSlider::-webkit-slider-thumb { -webkit-appearance: none; width: 22px; height: 22px; border-radius: 50%; background: #D4615A; cursor: pointer; border: 3px solid white; box-shadow: 0 2px 8px rgba(212,97,90,.45); }
+#liveSlider::-moz-range-thumb { width: 22px; height: 22px; border-radius: 50%; background: #D4615A; cursor: pointer; border: 3px solid white; }
+.live-val { font-family: 'Space Mono', monospace; font-size: 15px; font-weight: 700; color: #D4615A; min-width: 70px; }
+.live-presets { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.live-preset-lbl { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--sub); letter-spacing: 2px; text-transform: uppercase; }
+.lp-btn { padding: 5px 14px; border-radius: 100px; font-family: 'Space Mono', monospace; font-size: 10px; font-weight: 700; cursor: pointer; border: 1.5px solid var(--border); background: var(--white); color: var(--sub); transition: all .2s; }
+.lp-btn:hover, .lp-btn.active { background: #7B6EA8; color: white; border-color: #7B6EA8; }
+.live-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 20px; }
+.live-card { background: var(--white); border-radius: 14px; padding: 22px; border: 2px solid var(--border); box-shadow: 0 2px 12px var(--shadow); position: relative; overflow: hidden; transition: background .4s, border-color .3s; }
+.live-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--ac); }
+.lc-title { font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--ac); margin-bottom: 16px; }
+.lc-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 9px; }
+.lc-lbl { font-size: 11px; color: var(--sub); }
+.lc-val { font-family: 'Space Mono', monospace; font-size: 13px; font-weight: 700; color: var(--text); }
+.lc-bar-wrap { margin-top: 14px; }
+.lc-bar-top { display: flex; justify-content: space-between; font-family: 'Space Mono', monospace; font-size: 10px; color: var(--sub); margin-bottom: 5px; }
+.lc-bar-bg { height: 7px; background: var(--bg); border-radius: 4px; overflow: hidden; }
+.lc-bar-fill { height: 100%; background: var(--ac); border-radius: 4px; transition: width .5s ease; }
+.live-best { display: flex; align-items: center; gap: 16px; background: #2D2040; border-radius: 14px; padding: 20px 28px; flex-wrap: wrap; }
+[data-theme="dark"] .live-best { background: #120D1E; }
+.lb-label { font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,.4); }
+.lb-winner { font-size: 18px; font-weight: 800; color: #5ECFB4; }
+.lb-reason { font-size: 13px; color: rgba(255,255,255,.55); }
+</style>
+
+<script>
+// ── Simulation model ──────────────────────────────────
+const TR=100, IO=0.002, CS=0.001, DI=0.0005, IB=10;
+const PIO_POLL=0.15, PIO_CPU=0.68, DMA_EFF=97;
+function pio(s){ const t=s/TR, p=t*PIO_POLL, tot=t+p; return {total:tot, cpu:tot*PIO_CPU}; }
+function iio(s){ const t=s/TR, n=Math.max(1,Math.floor(s/IB)), ov=n*(IO+CS); return {total:t+ov, cpu:ov}; }
+function dma(s){ return {total:s/DMA_EFF, cpu:DI}; }
+
+function livePreset(v, btn){
+  document.getElementById('liveSlider').value = v;
+  document.querySelectorAll('.lp-btn').forEach(b => b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  liveUpdate(v);
+}
+
+function liveUpdate(sz){
+  sz = parseFloat(sz);
+  document.getElementById('liveVal').textContent = sz + ' MB';
+
+  const p=pio(sz), n=iio(sz), d=dma(sz);
+  const pu=p.cpu/p.total*100, nu=n.cpu/n.total*100, du=d.cpu/d.total*100;
+
+  function s(id,v){ const el=document.getElementById(id); if(el) el.textContent=v; }
+  function b(id,pct){ const el=document.getElementById(id); if(el) el.style.width=Math.min(100,Math.max(0.3,pct))+'%'; }
+
+  s('l-pio-time', p.total.toFixed(4)); s('l-pio-cpu', p.cpu.toFixed(4));
+  s('l-pio-tp', (sz/p.total).toFixed(1)); s('l-pio-util', pu.toFixed(1)+'%'); b('l-pio-bar', pu);
+
+  s('l-int-time', n.total.toFixed(4)); s('l-int-cpu', n.cpu.toFixed(4));
+  s('l-int-tp', (sz/n.total).toFixed(1)); s('l-int-util', nu.toFixed(2)+'%'); b('l-int-bar', nu);
+
+  s('l-dma-time', d.total.toFixed(4)); s('l-dma-cpu', d.cpu.toFixed(5));
+  s('l-dma-tp', (sz/d.total).toFixed(1)); s('l-dma-util', du.toFixed(3)+'%'); b('l-dma-bar', du);
+
+  // Best method recommendation
+  let winner, reason;
+  if(sz <= 5)       { winner='Programmed I/O';  reason=`For tiny ${sz}MB, PIO avoids DMA and interrupt setup overhead.`; }
+  else if(sz <= 80) { winner='Interrupt-Driven'; reason=`At ${sz}MB, Interrupt I/O balances low CPU overhead with manageable complexity.`; }
+  else              { winner='DMA';              reason=`For ${sz}MB, DMA frees the CPU entirely and delivers the best throughput.`; }
+
+  document.getElementById('lbWinner').textContent = winner;
+  document.getElementById('lbReason').textContent = reason;
+}
+
+// Init
+const saved = localStorage.getItem('theme') || 'light';
+document.documentElement.setAttribute('data-theme', saved);
+window.addEventListener('load', () => liveUpdate(50));
+</script>
+</body>
+</html>
+</body>
+</html>

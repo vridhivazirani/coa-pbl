@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>I/O Data Transfer Techniques — Studio Shodwe</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- SPLASH -->
+<div id="splash">
+  <div class="sp-tag">Studio Shodwe · COA Project</div>
+  <div class="sp-title">I/O Data<em>Transfer Techniques</em></div>
+  <div class="sp-sub">Computer Organization &amp; Architecture</div>
+  <button class="sp-btn" id="enterBtn" onclick="enterSite()">Enter</button>
+  <div class="sp-bar-wrap" id="spBarWrap">
+    <div class="sp-bar-bg"><div class="sp-bar-fill" id="spBarFill"></div></div>
+    <div class="sp-bar-label" id="spBarLabel">Initializing</div>
+  </div>
+  <div class="sp-dots" id="spDots"><div class="sp-dot"></div><div class="sp-dot"></div><div class="sp-dot"></div></div>
+</div>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="sb-logo"><span></span><span></span><span></span></div>
+  <nav class="sb-nav" id="sbNav"></nav>
+  <div class="sb-foot">Studio Shodwe</div>
+</div>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="topbar-breadcrumb">COA Project &nbsp;/&nbsp; <span id="topbarTitle">Home</span></div>
+  <div class="topbar-right">
+    <div class="page-counter" id="pageCounter">1 / 11</div>
+    <button class="theme-btn" id="themeBtn">🌙</button>
+  </div>
+</div>
+
+<!-- PROGRESS -->
+<div id="progress"></div>
+
+<!-- APP -->
+<div id="app">
+
+  <!-- PAGE 1: HOME -->
+  <div class="page active" id="pg-0">
+    <div class="home-hero">
+      <div class="pg-tag">Computer Organization &amp; Architecture</div>
+      <h1>I/O Data<br><span>Transfer</span><br>Techniques</h1>
+      <p class="sub-text">A deep dive into <strong>Programmed I/O</strong>, <strong>Interrupt-Driven I/O</strong>, and <strong>Direct Memory Access (DMA)</strong> — studying how data moves between the CPU, memory, and I/O devices.</p>
+      <div class="hero-chips">
+        <span class="chip chip-coral">COA Project</span>
+        <span class="chip chip-outline" onclick="goPage(6)">Run Simulation</span>
+        <span class="chip chip-outline" onclick="goPage(7)">Take Quiz</span>
+        <a class="chip chip-outline" href="simulation.html">Simulation Page</a>
+        <a class="chip chip-outline" href="results.html">Results Page</a>
+      </div>
+      <div class="hero-stats">
+        <div class="hstat"><div class="hstat-val">3</div><div class="hstat-label">I/O Methods</div></div>
+        <div class="hstat"><div class="hstat-val">7</div><div class="hstat-label">Data Sizes</div></div>
+        <div class="hstat"><div class="hstat-val">100<span style="font-size:13px">MB/s</span></div><div class="hstat-label">Transfer Rate</div></div>
+        <div class="hstat"><div class="hstat-val">~0%</div><div class="hstat-label">DMA CPU Usage</div></div>
+      </div>
+    </div>
+    <div class="home-pages">
+      <div class="hp-card" onclick="goPage(1)"><div class="hp-num">01</div><div class="hp-title">Problem Statement</div><div class="hp-desc">Why I/O efficiency matters in system design</div></div>
+      <div class="hp-card" onclick="goPage(2)"><div class="hp-num">02</div><div class="hp-title">I/O Organization</div><div class="hp-desc">Basic architecture and component diagram</div></div>
+      <div class="hp-card" onclick="goPage(3)"><div class="hp-num">03</div><div class="hp-title">Techniques</div><div class="hp-desc">PIO, Interrupt-Driven, and DMA explained</div></div>
+      <div class="hp-card" onclick="goPage(4)"><div class="hp-num">04</div><div class="hp-title">Comparison</div><div class="hp-desc">Side-by-side feature and performance table</div></div>
+      <div class="hp-card" onclick="goPage(5)"><div class="hp-num">05</div><div class="hp-title">Visualizer</div><div class="hp-desc">Animated bus transfer step-by-step</div></div>
+      <div class="hp-card" onclick="goPage(6)"><div class="hp-num">06</div><div class="hp-title">Simulation</div><div class="hp-desc">Live performance calculator with charts</div></div>
+      <div class="hp-card" onclick="goPage(7)"><div class="hp-num">07</div><div class="hp-title">Quiz</div><div class="hp-desc">Test your understanding with 6 questions</div></div>
+      <div class="hp-card" onclick="goPage(8)"><div class="hp-num">08</div><div class="hp-title">Glossary</div><div class="hp-desc">Key COA terms and definitions</div></div>
+      <div class="hp-card" onclick="goPage(9)"><div class="hp-num">09</div><div class="hp-title">Methodology</div><div class="hp-desc">Research approach and process</div></div>
+      <div class="hp-card" onclick="goPage(10)"><div class="hp-num">10</div><div class="hp-title">Our Contribution</div><div class="hp-desc">What we built that didn't exist before</div></div>
+    </div>
+    <div class="page-nav"><div></div><div class="pnav-info">Use the sidebar or cards to navigate</div><button class="pnav-btn primary" onclick="goPage(1)">Problem Statement →</button></div>
+  </div>
+
+  <!-- PAGE 2: PROBLEM -->
+  <div class="page prob-page" id="pg-1">
+    <div class="pg-tag">Problem Statement</div>
+    <h2>Why I/O <em>Efficiency</em> Matters</h2>
+    <div class="problem-card">
+      Efficient data transfer between the <strong>CPU</strong>, <strong>main memory</strong>, and <strong>input/output devices</strong> is essential for overall system performance in computer architecture. Different I/O data transfer techniques — <strong>Programmed I/O</strong>, <strong>Interrupt-Driven I/O</strong>, and <strong>Direct Memory Access (DMA)</strong> — vary in terms of CPU involvement, hardware complexity, and bus utilization.
+      <br><br>
+      Inefficient transfer methods can lead to increased <strong>CPU overhead</strong>, reduced throughput, and poor system responsiveness. This project aims to study, implement, and evaluate these I/O transfer techniques from a hardware architecture perspective — analyzing their operational mechanisms, performance impact, and suitability for different data workloads within a computer organization framework.
+    </div>
+    <div class="page-nav">
+      <button class="pnav-btn" onclick="goPage(0)">← Home</button>
+      <div class="pnav-info">Page 2 of 11</div>
+      <button class="pnav-btn primary" onclick="goPage(2)">I/O Organization →</button>
+    </div>
+  </div>
+
+  <!-- PAGE 3: I/O ORG -->
+  <div class="page" id="pg-2">
+    <div class="pg-tag">Architecture</div>
+    <h2>Basic I/O <em>Organization</em></h2>
+    <div class="diagram-row">
+      <div class="diagram-visual">
+        <div class="dbox db-cpu">CPU</div><div class="darrow"></div>
+        <div class="dbox db-bus">System Bus</div><div class="darrow"></div>
+        <div class="dbox db-io">I/O Interface</div><div class="darrow"></div>
+        <div class="dbox db-dev">I/O Device</div>
+      </div>
+      <div class="diagram-info">
+        <h3>Main Components</h3>
+        <ul class="info-list">
+          <li><span class="info-num">1</span><span><strong>CPU</strong> — Controls and initiates all I/O operations</span></li>
+          <li><span class="info-num">2</span><span><strong>Main Memory</strong> — Stores instructions and data being transferred</span></li>
+          <li><span class="info-num">3</span><span><strong>I/O Interface Module</strong> — Connects external devices to the system bus</span></li>
+          <li><span class="info-num">4</span><span><strong>I/O Devices</strong> — Keyboard, mouse, disk, printer, network cards, etc.</span></li>
+        </ul>
+      </div>
+    </div>
+    <div class="page-nav">
+      <button class="pnav-btn" onclick="goPage(1)">← Problem</button>
+      <div class="pnav-info">Page 3 of 11</div>
+      <button class="pnav-btn primary" onclick="goPage(3)">Techniques →</button>
+    </div>
+  </div>
+
+  <!-- PAGE 4: TECHNIQUES -->
+  <div class="page tech-page" id="pg-3">
+    <div class="pg-tag">Transfer Methods</div>
+    <h2>The Three <em>Techniques</em></h2>
+    <div class="technique-grid">
+      <div class="tc c-pio">
+        <div class="tc-hd"><div class="tc-icon" style="background:#FDE8E6"></div><div><div class="tc-name">Programmed I/O</div><div class="tc-sub">Polling / Busy-Wait</div></div></div>
+        <div class="tc-body">
+          <div class="tc-lbl">Flow</div>
+          <ul class="tc-steps"><li data-n="1">CPU sends I/O read/write command</li><li data-n="2">CPU checks status register (polls)</li><li data-n="3">CPU waits until device is ready</li><li data-n="4">Data transferred via system bus</li></ul>
+          <div class="tc-lbl">Key COA Terms</div>
+          <div class="tc-terms"><span class="tc-term">Control Register</span><span class="tc-term">Status Register</span><span class="tc-term">Data Register</span><span class="tc-term">Busy Flag</span></div>
+        </div>
+      </div>
+      <div class="tc c-int">
+        <div class="tc-hd"><div class="tc-icon" style="background:#EBE6F8"></div><div><div class="tc-name">Interrupt-Driven</div><div class="tc-sub">Event-based I/O</div></div></div>
+        <div class="tc-body">
+          <div class="tc-lbl">Flow</div>
+          <ul class="tc-steps"><li data-n="1">CPU sends I/O command to device</li><li data-n="2">CPU continues executing other tasks</li><li data-n="3">Device sends interrupt signal when ready</li><li data-n="4">CPU executes ISR (Interrupt Service Routine)</li></ul>
+          <div class="tc-lbl">Key COA Terms</div>
+          <div class="tc-terms"><span class="tc-term">Interrupt Line</span><span class="tc-term">Vector Table</span><span class="tc-term">Context Switch</span><span class="tc-term">Priority Interrupt</span></div>
+        </div>
+      </div>
+      <div class="tc c-dma">
+        <div class="tc-hd"><div class="tc-icon" style="background:#E0F8F2"></div><div><div class="tc-name">DMA</div><div class="tc-sub">Direct Memory Access</div></div></div>
+        <div class="tc-body">
+          <div class="tc-lbl">Flow</div>
+          <ul class="tc-steps"><li data-n="1">CPU initializes the DMA controller</li><li data-n="2">DMA takes control of the system bus</li><li data-n="3">Direct transfer between memory &amp; device</li><li data-n="4">CPU is free during the entire transfer</li></ul>
+          <div class="tc-lbl">DMA Controller Has</div>
+          <div class="tc-terms"><span class="tc-term">Address Register</span><span class="tc-term">Count Register</span><span class="tc-term">Control Register</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="page-nav">
+      <button class="pnav-btn" onclick="goPage(2)">← I/O Org</button>
+      <div class="pnav-info">Page 4 of 11</div>
+      <button class="pnav-btn primary" onclick="goPage(4)">Comparison →</button>
+    </div>
+  </div>
+
+  <!-- PAGE 5: COMPARISON -->
+  <div class="page comp-page" id="pg-4">
+    <div class="pg-tag">Analysis</div>
+    <h2>Side-by-Side <em>Comparison</em></h2>
+    <table class="comp-table">
+      <thead><tr><th>Feature</th><th>Programmed I/O</th><th>Interrupt I/O</th><th>DMA</th></tr></thead>
+      <tbody>
+        <tr><td>CPU Involvement</td><td><span class="badge bh">High</span></td><td><span class="badge bm">Medium</span></td><td><span class="badge bl">Low</span></td></tr>
+        <tr><td>Hardware Complexity</td><td><span class="badge bl">Low</span></td><td><span class="badge bm">Medium</span></td><td><span class="badge bh">High</span></td></tr>
+        <tr><td>Bus Usage</td><td>CPU Controlled</td><td>CPU Controlled</td><td>DMA Controlled</td></tr>
+        <tr><td>Suitable For</td><td>Small data</td><td>Medium data</td><td>Large data</td></tr>
+        <tr><td>CPU Free During Transfer?</td><td>❌ No</td><td>✅ Mostly</td><td>✅ Yes</td></tr>
+        <tr><td>Implementation Cost</td><td><span class="badge bl">Low</span></td><td><span class="badge bm">Medium</span></td><td><span class="badge bh">High</span></td></tr>
+      </tbody>
+    </table>
+    <div class="page-nav">
+      <button class="pnav-btn" onclick="goPage(3)">← Techniques</button>
+      <div class="pnav-info">Page 5 of 11</div>
+      <button class="pnav-btn primary" onclick="goPage(5)">Visualizer →</button>
+    </div>
+  </div>
+
+  <!-- PAGE 6: VISUALIZER -->
+  <div class="page" id="pg-5">
+    <div class="pg-tag">Interactive</div>
+    <h2>Bus Transfer <em>Visualizer</em></h2>
+    <div class="viz-tabs">
+      <button class="viz-tab active" onclick="setViz('pio',this)">Programmed I/O</button>
+      <button class="viz-tab" onclick="setViz('int',this)">Interrupt-Driven</button>
+      <button class="viz-tab" onclick="setViz('dma',this)">DMA</button>
+    </div>
+    <div class="viz-scene">
+      <div class="bus-row" id="vizRow"></div>
+      <div class="viz-status" id="vizStatus">Press <strong>Run</strong> to animate the data transfer step by step.</div>
+      <div class="viz-meter-wrap">
+        <div class="viz-meter-label"><span>CPU Utilization</span><span id="vizPct">—</span></div>
+        <div class="viz-meter-bg"><div class="viz-meter-fill" id="vizMeter" style="width:0%"></div></div>
+      </div>
+      <div class="viz-btns">
+        <button class="vbtn vbtn-run" onclick="runViz()">▶ Run</button>
+        <button class="vbtn vbtn-stop" onclick="stopViz()">■ Stop</button>
+      </div>
+    </div>
+    <div class="page-nav">
+      <button class="pnav-btn" onclick="goPage(4)">← Comparison</button>
+      <div class="pnav-info">Page 6 of 11</div>
+      <button class="pnav-btn primary" onclick="goPage(6)">Simulation →</button>
+    </div>
+  </div>
+
+  <!-- PAGE 7: SIMULATION -->
+  <div class="page" id="pg-6">
+    <div class="pg-tag">Interactive Simulation</div>
+    <h2>Live <em>Performance</em> Simulator</h2>
+    <div class="sim-top">
+      <div class="sim-ctrl">
+        <div class="sim-row">
+          <div class="sim-label">Data Size:</div>
+          <input type="range" class="sim-slider" id="sizeSlider" min="1" max="1000" value="50" oninput="updateSim(this.value)">
+          <div class="sim-val" id="sizeVal">50 MB</div>
+        </div>
+        <div class="presets">
+          <span class="prs-lbl">Presets:</span>
+          <button class="pbtn" onclick="setPreset(1,this)">1MB</button>
+          <button class="pbtn active" onclick="setPreset(50,this)">50MB</button>
+          <button class="pbtn" onclick="setPreset(250,this)">250MB</button>
+          <button class="pbtn" onclick="setPreset(1000,this)">1GB</button>
+        </div>
+      </div>
+      <div class="rec-box">
+        <div class="rec-title">Best Method</div>
+        <div class="rec-winner" id="recWinner">DMA</div>
+        <div class="rec-reason" id="recReason">For 50MB, DMA frees the CPU entirely.</div>
+      </div>
+    </div>
+    <div class="sim-cards">
+      <div class="sim-card" style="--ac:var(--coral)" id="card-pio">
+        <div class="sc-title">Programmed I/O</div>
+        <div class="sm"><div class="sm-lbl">Total Time</div><div><span class="sm-val" id="pio-time">0.50</span><span class="sm-unit">s</span></div></div>
+        <div class="sm"><div class="sm-lbl">CPU Busy</div><div><span class="sm-val" id="pio-cpu">0.50</span><span class="sm-unit">s</span></div></div>
+        <div class="sm"><div class="sm-lbl">Throughput</div><div><span class="sm-val" id="pio-tp">100</span><span class="sm-unit">MB/s</span></div></div>
+        <div class="sb-wrap"><div class="sb-lbl"><span>CPU Util.</span><span id="pio-util">100%</span></div><div class="sb-bg"><div class="sb-fill" id="pio-bar" style="width:100%"></div></div></div>
+      </div>
+      <div class="sim-card" style="--ac:var(--purple)" id="card-int">
+        <div class="sc-title">Interrupt-Driven</div>
+        <div class="sm"><div class="sm-lbl">Total Time</div><div><span class="sm-val" id="int-time">0.51</span><span class="sm-unit">s</span></div></div>
+        <div class="sm"><div class="sm-lbl">CPU Busy</div><div><span class="sm-val" id="int-cpu">0.015</span><span class="sm-unit">s</span></div></div>
+        <div class="sm"><div class="sm-lbl">Throughput</div><div><span class="sm-val" id="int-tp">98</span><span class="sm-unit">MB/s</span></div></div>
+        <div class="sb-wrap"><div class="sb-lbl"><span>CPU Util.</span><span id="int-util">3%</span></div><div class="sb-bg"><div class="sb-fill" id="int-bar" style="width:3%"></div></div></div>
+      </div>
+      <div class="sim-card" style="--ac:var(--mint)" id="card-dma">
+        <div class="sc-title">DMA</div>
+        <div class="sm"><div class="sm-lbl">Total Time</div><div><span class="sm-val" id="dma-time">0.50</span><span class="sm-unit">s</span></div></div>
+        <div class="sm"><div class="sm-lbl">CPU Busy</div><div><span class="sm-val" id="dma-cpu">0.0005</span><span class="sm-unit">s</span></div></div>
+        <div class="sm"><div class="sm-lbl">Throughput</div><div><span class="sm-val" id="dma-tp">100</span><span class="sm-unit">MB/s</span></div></div>
+        <div class="sb-wrap"><div class="sb-lbl"><span>CPU Util.</span><span id="dma-util">0.1%</span></div><div class="sb-bg"><div class="sb-fill" id="dma-bar" style="width:0.1%"></div></div></div>
+      </div>
+    </div>
+    <div class="chart-area">
+      <div class="chart-tabs">
+        <button class="ctab active" onclick="setChart('cpu',this)">CPU Busy Time</button>
+        <button class="ctab" onclick="setChart('total',this)">Total Time</button>
+        <button class="ctab" onclick="setChart('throughput',this)">Throughput</button>
+        <button class="ctab" onclick="setChart('util',this)">CPU Util %</button>
+      </div>
+      <div class="chart-hd" id="chartTitle">CPU Busy Time vs. Data Size</div>
+      <div class="chart-sub" id="chartSub">Lower is better — CPU time spent blocked on I/O.</div>
+      <canvas id="chartCanvas" height="220"></canvas>
+      <div class="export-row"><button class="exp-btn" onclick="exportCSV()">↓ Export CSV</button></div>
+    </div>
+    <div class="page-nav">
+      <button class="pnav-btn" onclick="goPage(5)">← Visualizer</button>
+      <div class="pnav-info">Page 7 of 11</div>
+      <button class="pnav-btn primary" onclick="goPage(7)">Quiz →</button>
+    </div>
+  </div>
+
+  <!-- PAGE 8: QUIZ -->
+  <div class="page quiz-page" id="pg-7">
+    <div class="pg-tag">Knowledge Check</div>
+    <h2>Test Your <em>Understanding</em></h2>
+    <div class="quiz-wrap">
+      <div class="qprog" id="qprog"></div>
+      <div class="qcard" id="qcard"></div>
+      <div class="qresult" id="qresult">
+        <div class="qrs" id="qrScore">0/6</div>
+        <div class="qrl">YOUR SCORE</div>
+        <div class="qrm" id="qrMsg"></div>
+        <button class="qrst" onclick="restartQuiz()">↺ Try Again</button>
+      </div>
+    </div>
+    <div class="page-nav">
+      <button class="pnav-btn" onclick="goPage(6)">← Simulation</button>
+      <div class="pnav-info">Page 8 of 11</div>
+      <button class="pnav-btn primary" onclick="goPage(8)">Glossary →</button>
+    </div>
+  </div>
+
+  <!-- PAGE 9: GLOSSARY -->
+  <div class="page" id="pg-8">
+    <div class="pg-tag">Reference</div>
+    <h2>COA <em>Glossary</em></h2>
+    <div class="gloss-grid">
+      <div class="gc"><div class="gt">Status Register</div><div class="gd">Holds flags (BUSY, READY, ERROR) that the CPU checks to know if an I/O device is ready for transfer.</div></div>
+      <div class="gc"><div class="gt">Busy-Wait / Polling</div><div class="gd">The CPU continuously checks a device's status register in a loop until it is ready — wasting CPU cycles.</div></div>
+      <div class="gc"><div class="gt">Interrupt Service Routine</div><div class="gd">A special function (ISR) executed by the CPU when it receives an interrupt signal from an I/O device.</div></div>
+      <div class="gc"><div class="gt">Interrupt Vector Table</div><div class="gd">A table storing addresses of ISRs indexed by interrupt number, so the CPU knows where to jump.</div></div>
+      <div class="gc"><div class="gt">Context Switching</div><div class="gd">Saving the current CPU state and loading another process's state — necessary when servicing an interrupt.</div></div>
+      <div class="gc"><div class="gt">DMA Controller</div><div class="gd">A dedicated hardware unit managing data transfers between memory and I/O devices without CPU involvement.</div></div>
+      <div class="gc"><div class="gt">Bus Arbitration</div><div class="gd">The process by which the DMA controller or CPU gains ownership of the system bus to perform a transfer.</div></div>
+      <div class="gc"><div class="gt">Throughput</div><div class="gd">Amount of data successfully transferred per unit of time (MB/s) — a key system performance metric.</div></div>
+      <div class="gc"><div class="gt">CPU Overhead</div><div class="gd">The fraction of CPU time consumed managing I/O instead of executing useful application code.</div></div>
+    </div>
+    <div class="page-nav">
+      <button class="pnav-btn" onclick="goPage(7)">← Quiz</button>
+      <div class="pnav-info">Page 9 of 11</div>
+      <button class="pnav-btn primary" onclick="goPage(9)">Methodology →</button>
+    </div>
+  </div>
+
+  <!-- PAGE 10: METHODOLOGY -->
+  <div class="page meth-page" id="pg-9">
+    <div class="pg-tag">Research Approach</div>
+    <h2>Project <em>Methodology</em></h2>
+    <div class="method-grid">
+      <div class="method-card"><div class="method-num">01</div><h3>Literature Review</h3><p>Explored CPU, memory, and I/O structures. Reviewed PIO, Interrupt-Driven I/O, and DMA from foundational texts.</p></div>
+      <div class="method-card"><div class="method-num">02</div><h3>System Design</h3><p>Created architectural diagrams for each I/O approach. Mapped data flow, control lines, and bus activity.</p></div>
+      <div class="method-card"><div class="method-num">03</div><h3>Implementation</h3><p>Simulated data transfer for small, medium, and large sizes. Modeled CPU actions under each method in Python.</p></div>
+      <div class="method-card"><div class="method-num">04</div><h3>Performance Eval</h3><p>Tracked CPU utilization, transfer speed, throughput (MB/s), and bus load across all three techniques.</p></div>
+      <div class="method-card"><div class="method-num">05</div><h3>Comparative Analysis</h3><p>Studied efficiency, hardware requirements, and identified the best use cases for each transfer method.</p></div>
+    </div>
+    <div class="page-nav">
+      <button class="pnav-btn" onclick="goPage(8)">← Glossary</button>
+      <div class="pnav-info">Page 10 of 11</div>
+      <button class="pnav-btn primary" onclick="goPage(10)">Our Contribution →</button>
+    </div>
+  </div>
+
+  <!-- PAGE 11: CONTRIBUTION -->
+  <div class="page contrib-page" id="pg-10">
+    <div class="pg-tag">Originality</div>
+    <h2>What We <em>Built</em></h2>
+    <p class="contrib-intro">Yes — the theory of I/O transfer techniques is documented in textbooks. But this project is not a textbook. Here is what we built from scratch that did not exist before.</p>
+    <div class="contrib-grid">
+      <div class="contrib-card"><div class="contrib-num">01</div><div><div class="contrib-title">Original Python Simulation</div><div class="contrib-desc">We wrote a custom performance model with defined constants — transfer rate, interrupt overhead, context switch cost, DMA init time, and block size — and ran it across 7 data sizes.</div><span class="contrib-tag">Python · Quantitative Analysis</span></div></div>
+      <div class="contrib-card"><div class="contrib-num">02</div><div><div class="contrib-title">Live Interactive Simulator</div><div class="contrib-desc">We rebuilt the Python model in JavaScript connected to a real-time slider. Any data size from 1MB to 1GB updates all three methods simultaneously.</div><span class="contrib-tag">JavaScript · Real-time Computation</span></div></div>
+      <div class="contrib-card"><div class="contrib-num">03</div><div><div class="contrib-title">Animated Bus Visualizer</div><div class="contrib-desc">A step-by-step animation showing exactly what happens on the system bus for each I/O technique. This does not exist in any textbook or standard COA resource.</div><span class="contrib-tag">Animation · Hardware Modeling</span></div></div>
+      <div class="contrib-card"><div class="contrib-num">04</div><div><div class="contrib-title">4-View Dynamic Chart System</div><div class="contrib-desc">Built from scratch using HTML Canvas API — no library — rendering four performance views that update live based on selected data size.</div><span class="contrib-tag">Canvas API · Data Visualization</span></div></div>
+      <div class="contrib-card"><div class="contrib-num">05</div><div><div class="contrib-title">Smart Recommendation Engine</div><div class="contrib-desc">Logic that evaluates which I/O method is optimal for any given data size and explains why — applied analysis, not just theory.</div><span class="contrib-tag">Decision Logic · Applied COA</span></div></div>
+      <div class="contrib-card"><div class="contrib-num">06</div><div><div class="contrib-title">Full Multi-Page Web Platform</div><div class="contrib-desc">Designed and coded as a single self-contained multi-page web app — not a slide deck, not a copied resource. A working tool built for this subject.</div><span class="contrib-tag">HTML · CSS · JavaScript · No Frameworks</span></div></div>
+    </div>
+    <div class="page-nav">
+      <button class="pnav-btn" onclick="goPage(9)">← Methodology</button>
+      <div class="pnav-info">Page 11 of 11</div>
+      <button class="pnav-btn primary" onclick="goPage(0)">Back to Home →</button>
+    </div>
+  </div>
+
+</div><!-- end #app -->
+
+<script src="script.js"></script>
+</body>
+</html>
